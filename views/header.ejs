@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Blog</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+  </head>
+<body>
+
+<header>
+  <h1><%= title %></h1>
+</header>
+
+<nav>
+  <span><a title="主頁" href="/">home</a></span>
+  <span><a title="存檔" href="/archive">archive</a></span>
+  <span><a title="標籤" href="/tags">tags</a></span>
+  <span><a title="友情連接" href="/links">links</a></span>
+  <% if (user) { %>
+    <span><a title="發表" href="/post">post</a></span>
+    <span><a title="登出" href="/logout">logout</a></span>
+  <% } else { %>
+    <span><a title="登入" href="/login">login</a></span>
+    <span><a title="註冊" href="/reg">register</a></span>
+  <% } %>
+  <span><form action="/search" method="GET"><input type="text" name="keyword" placeholder="SEARCH" class="search" /></form></span>
+</nav>
+
+<article>
+
+<% if (flash && typeof flash == 'string') { %>
+  <div><%= flash %></div>
+<% } %>

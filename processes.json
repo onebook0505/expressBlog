@@ -1,0 +1,10 @@
+{
+  "apps" : [{
+    "name"        : "expressBlog",
+    "script"      : "app.js",
+    "env": {
+        "PORT": 3000,
+        "DEBUG": "*"
+    }
+  }]
+}
