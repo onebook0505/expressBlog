@@ -1,7 +1,6 @@
 {
   "name": "expressBlog",
   "version": "1.0.0",
-  "private": true,
   "description": "expressBlog for express4.x",
   "scripts": {
     "start": "node app"

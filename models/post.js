@@ -208,6 +208,7 @@ exports.getOne = function (id, cb) {
           mongoPool.release(client);
           return cb(exception(exception.NotFound, 'NotFound ' + id));
         }
+        // 拿到資料後，進行一些編譯動作
         doc.content = marked(doc.content);
         doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
         doc.comments.forEach(function (comment) {

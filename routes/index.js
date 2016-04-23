@@ -38,8 +38,8 @@ module.exports = function (app) {
           posts: posts,
           page: page,
           user: req.session.user,
-          isFirstPage: (page - 1) === 0,
-          isLastPage: ((page - 1) * 10 + posts.length) === total,
+          isFirstPage: page === 1,
+          isLastPage: ((page - 1) * 10 + posts.length) === total, // 利用頁數+目前頁面資料筆數去算總筆數
           flash: req.flash('info').toString()
         });
       });

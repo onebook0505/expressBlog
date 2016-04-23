@@ -1,11 +1,11 @@
 {
-  "app": 3000,
+  "app": 3001,
   "session": {
     "resave": true,
     "saveUninitialized": true,
     "secret": "blog",
     "cookie": {
-      "maxAge": 2592000000
+      "maxAge": 2590000000
     }
   },
   "mongo": {
