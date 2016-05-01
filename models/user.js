@@ -1,5 +1,6 @@
 var exception = require('../lib/exception');
 var mongoPool = require('../lib/mongoPool');
+var config = require('../config').mongo;
 
 exports.save = function (doc, cb) {
   mongoPool.acquire(function (err, client) {
@@ -7,7 +8,7 @@ exports.save = function (doc, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('users')
       .insert(doc, function (err, res) {
         if (err) {
@@ -26,7 +27,7 @@ exports.get = function (name, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('users')
       .findOne({"name": name}, {"_id": 0}, function (err, doc) {
         if (err) {

@@ -5,6 +5,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 var exception = require('../lib/exception');
 var mongoPool = require('../lib/mongoPool');
+var config = require('../config').mongo;
 
 exports.save = function (user, data, cb) {
   var tags = {};
@@ -29,7 +30,7 @@ exports.save = function (user, data, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .insert(doc, function (err, res) {
         if (err) {
@@ -52,7 +53,7 @@ exports.getTen = function (name, page, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .find(query)
       .sort({time: -1})
@@ -88,7 +89,7 @@ exports.count = function (name, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .count(query, function (err, res) {
         if (err) {
@@ -107,7 +108,7 @@ exports.getArchive = function (cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .find({}, {"time": 1, "title": 1})
       .sort({time: -1})
@@ -131,7 +132,7 @@ exports.getTags = function (cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .distinct("tags", function (err, res) {
         if (err) {
@@ -150,7 +151,7 @@ exports.getTag = function (tag, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .find({"tags": tag}, {"title": 1, "time": 1})
       .toArray(function (err, docs) {
@@ -174,7 +175,7 @@ exports.search = function (keyword, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .find({"title": pattern}, {"time": 1, "title": 1})
       .toArray(function (err, docs) {
@@ -197,7 +198,7 @@ exports.getOne = function (id, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .findAndModify({"_id": new ObjectID(id)}, [], {"$inc": {pv: 1}}, {new: true}, function (err, doc) {
         if (err) {
@@ -209,14 +210,14 @@ exports.getOne = function (id, cb) {
           return cb(exception(exception.NotFound, 'NotFound ' + id));
         }
         // 拿到資料後，進行一些編譯動作
-        doc.content = marked(doc.content);
-        doc.time = moment(doc.time).format('YYYY-MM-DD HH:mm');
-        doc.comments.forEach(function (comment) {
+        doc.value.content = marked(doc.value.content);
+        doc.value.time = moment(doc.value.time).format('YYYY-MM-DD HH:mm');
+        doc.value.comments.forEach(function (comment) {
           comment.content = marked(comment.content);
           comment.time = moment(comment.time).format('YYYY-MM-DD HH:mm');
         });
         mongoPool.release(client);
-        cb(null, doc);
+        cb(null, doc.value);
       });
   });
 };
@@ -227,7 +228,7 @@ exports.postOne = function (id, newComment, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .update({"_id": new ObjectID(id)}, {"$push": {"comments": newComment}}, function (err, res) {
         if (err) {
@@ -250,7 +251,7 @@ exports.getEdit = function (id, name, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .findOne({"_id": new ObjectID(id), "name": name}, function (err, doc) {
         if (err) {
@@ -280,7 +281,7 @@ exports.postEdit = function (id, name, doc, cb) {
     });
     doc.tags = Object.keys(tags);
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .update({"_id": new ObjectID(id), "name": name}, {"$set": doc}, function (err, res) {
         if (err) {
@@ -303,7 +304,7 @@ exports.getDelete = function (id, name, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .remove({"_id": new ObjectID(id), "name": name}, function (err, res) {
         if (err) {
@@ -326,7 +327,7 @@ exports.getReprint = function (id, currentUser, cb) {
       return cb(exception(exception.MongoPoolError, err.message));
     }
     client
-      .db('blog')
+      .db(config.db)
       .collection('posts')
       .findAndModify({"_id": new ObjectID(id)}, [], {"$inc": {reprint_num: 1}}, {new: true}, function (err, doc) {
         if (err) {
@@ -350,7 +351,7 @@ exports.getReprint = function (id, currentUser, cb) {
         doc.pv = 0;
 
         client
-          .db('blog')
+          .db(config.db)
           .collection('posts')
           .insert(doc, function (err, res) {
             if (err) {
